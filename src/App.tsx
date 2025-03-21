@@ -4,22 +4,30 @@ import { Input, ButtonAdd, Task } from './components'
 import { ToastContainer, toast } from 'react-toastify';
 
 function App() {
+
+  interface ITask{
+    id: number;
+    task: string;
+  }
   const [task, setTask] = useState<string>('')
-  const [tareas, setTareas] = useState<string[]>([]);
+  const [tareas, setTareas] = useState<ITask[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const newTask: string = task.trim()
     if (newTask.length === 0) return
-    setTareas([...tareas, newTask]);
+    const newTaskObject: ITask = { id: Date.now(), task: newTask };
+    setTareas([...tareas, newTaskObject]);
+
     setTask('');
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }
   const notify = () => toast("Tarea eliminada");
+
   function handleDeleteTask(index: number) {
-    const newTasks: string[] = tareas.filter((_, i) => i !== index)
+    const newTasks: ITask[] = tareas.filter((_, i) => i !== index)
     setTareas(newTasks)
     notify();
   }
@@ -38,9 +46,7 @@ function App() {
               tareas.length === 0 ? <p>No hay tareas. ¡Añade una!</p> :
                 (
                   tareas.map((task, index) => (
-                    <Task key={index} task={task} parentMethod={() => handleDeleteTask(index)}></Task>
-                    // <li key={index}>{task}</li>
-                    
+                    <Task key={task.id} task={task.task} parentMethod={() => handleDeleteTask(index)}></Task>
                   ))
                 )
             }
